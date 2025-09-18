@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import ArtistListTable from '../components/ArtistListTable';
 
 /**
  * PUBLIC_INTERFACE
@@ -17,8 +17,6 @@ export default function ArtistsPage({ mockArtists }) {
       [a.name, a.genre, a.status].join(' ').toLowerCase().includes(t)
     );
   }, [q, mockArtists]);
-
-  const navigate = useNavigate();
 
   return (
     <div>
@@ -46,35 +44,7 @@ export default function ArtistsPage({ mockArtists }) {
           </select>
         </div>
         <div style={{ padding: 14 }}>
-          <div className="table-wrap" role="region" aria-label="Artists table scroll area">
-            <table className="table" role="table" aria-label="Artists">
-              <thead>
-                <tr>
-                  <th>Name</th><th>Genre</th><th>Rating</th><th>Bookings</th><th>Next Show</th><th>Status</th><th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(a => (
-                  <tr key={a.id}>
-                    <td style={{ fontWeight:700 }}>{a.name}</td>
-                    <td>{a.genre}</td>
-                    <td>{a.rating}</td>
-                    <td>{a.bookings}</td>
-                    <td>{a.nextShow}</td>
-                    <td>
-                      <span className="badge">
-                        <span className="badge-dot" style={{ background: a.status === 'Active' ? '#10B981' : '#9CA3AF' }} />
-                        {a.status}
-                      </span>
-                    </td>
-                    <td>
-                      <button className="btn ghost" onClick={() => navigate(`/artists/${a.id}`)}>View</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ArtistListTable artists={filtered} />
         </div>
       </div>
     </div>

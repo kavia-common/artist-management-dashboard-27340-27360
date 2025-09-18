@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from 'react';
+import BookingsTable from '../components/BookingsTable';
+import { detectCityConflicts, groupBookingsByCity } from '../components/utils/bookingUtils';
 
 /**
  * PUBLIC_INTERFACE
@@ -6,10 +8,8 @@ import React, { useMemo, useState } from 'react';
  * Bookings overview with tabs and conflict highlighting.
  * Props:
  *  - mockBookings: array of bookings
- *  - detectCityConflicts: function(bookings) -> Set of conflicting booking IDs
- *  - groupBookingsByCity: function(bookings) -> { [city]: bookings[] }
  */
-export default function BookingsPage({ mockBookings, detectCityConflicts, groupBookingsByCity }) {
+export default function BookingsPage({ mockBookings }) {
   /**
    * Bookings overview with two tabs:
    * - All: All bookings flat list
@@ -19,8 +19,8 @@ export default function BookingsPage({ mockBookings, detectCityConflicts, groupB
   const [cityFilter, setCityFilter] = useState('');   // optional city dropdown filter inside "By City"
 
   const bookings = mockBookings; // later: replace with API data
-  const conflicts = useMemo(() => detectCityConflicts(bookings), [bookings, detectCityConflicts]);
-  const grouped = useMemo(() => groupBookingsByCity(bookings), [bookings, groupBookingsByCity]);
+  const conflicts = useMemo(() => detectCityConflicts(bookings), [bookings]);
+  const grouped = useMemo(() => groupBookingsByCity(bookings), [bookings]);
   const cities = useMemo(() => Object.keys(grouped).sort(), [grouped]);
 
   const tabBtn = (id, label) => (
@@ -74,40 +74,7 @@ export default function BookingsPage({ mockBookings, detectCityConflicts, groupB
           {activeTab === 'all' && (
             <>
               <h3>All Bookings</h3>
-              <div className="table-wrap" role="region" aria-label="Bookings table scroll area">
-                <table className="table" role="table" aria-label="Bookings">
-                  <thead>
-                    <tr><th>Artist</th><th>Venue</th><th>City</th><th>Date</th><th>Fee</th><th>Status</th></tr>
-                  </thead>
-                  <tbody>
-                    {bookings.map(b => {
-                      const isConflict = conflicts.has(b.id);
-                      return (
-                        <tr key={b.id} style={isConflict ? { outline: '2px solid rgba(245,158,11,0.35)', outlineOffset: '-2px' } : undefined}>
-                          <td style={{ fontWeight:700, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {b.artist}
-                            {isConflict && (
-                              <span className="badge" title="Potential conflict: same artist booked in same city and date">
-                                <span className="badge-dot" style={{ background: '#F59E0B' }} />Conflict
-                              </span>
-                            )}
-                          </td>
-                          <td>{b.venue}</td>
-                          <td>{b.city}</td>
-                          <td>{b.date}</td>
-                          <td>${b.fee.toLocaleString()}</td>
-                          <td>
-                            <span className="badge">
-                              <span className="badge-dot" style={{ background: b.status === 'Confirmed' ? '#10B981' : b.status === 'Pending' ? '#F59E0B' : '#EF4444' }} />
-                              {b.status}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <BookingsTable bookings={bookings} conflictIds={conflicts} />
             </>
           )}
 
@@ -153,42 +120,11 @@ export default function BookingsPage({ mockBookings, detectCityConflicts, groupB
                           </span>
                         )}
                       </div>
-                      <div className="table-wrap" role="region" aria-label={`Bookings in ${city} scroll area`}>
-                        <table className="table" role="table" aria-label={`Bookings in ${city}`}>
-                          <thead>
-                            <tr><th>Artist</th><th>Venue</th><th>Date</th><th>Fee</th><th>Status</th></tr>
-                          </thead>
-                          <tbody>
-                            {list.map(b => {
-                              const isConflict = cityConflicts.has(b.id);
-                              return (
-                                <tr key={b.id} style={isConflict ? { outline: '2px solid rgba(245,158,11,0.35)', outlineOffset: '-2px' } : undefined}>
-                                  <td style={{ fontWeight:700, display:'flex', alignItems:'center', gap:8 }}>
-                                    {b.artist}
-                                    {isConflict && (
-                                      <span className="badge" title="Potential conflict: same artist booked in same city and date">
-                                        <span className="badge-dot" style={{ background: '#F59E0B' }} />Conflict
-                                      </span>
-                                    )}
-                                  </td>
-                                  <td>{b.venue}</td>
-                                  <td>{b.date}</td>
-                                  <td>${b.fee.toLocaleString()}</td>
-                                  <td>
-                                    <span className="badge">
-                                      <span className="badge-dot" style={{ background: b.status === 'Confirmed' ? '#10B981' : b.status === 'Pending' ? '#F59E0B' : '#EF4444' }} />
-                                      {b.status}
-                                    </span>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                            {list.length === 0 && (
-                              <tr><td colSpan="5" style={{ color:'var(--muted)' }}>No bookings for this city.</td></tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
+                      <BookingsTable
+                        bookings={list}
+                        conflictIds={cityConflicts}
+                        columns={['Artist','Venue','Date','Fee','Status']}
+                      />
                     </div>
                   );
                 })}
