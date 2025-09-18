@@ -60,7 +60,11 @@ export default function ArtistProfile({ id, mockArtists, mockBookings }) {
                   </tr>
                 ))}
                 {upcoming.length === 0 && (
-                  <tr><td colSpan="5" style={{ color:'var(--muted)' }}>No bookings yet.</td></tr>
+                  <tr>
+                    <td colSpan="5">
+                      <div className="empty-state">No bookings yet.</div>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

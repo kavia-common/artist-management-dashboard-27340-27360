@@ -86,7 +86,7 @@ function Sidebar() {
           ☰
         </button>
       </div>
-      <nav className="nav" role="navigation">
+      <nav className="nav" role="navigation" aria-label="Primary">
         {navItems.map(n => (
           <NavLink
             key={n.to}
@@ -94,8 +94,9 @@ function Sidebar() {
             end={n.to === '/'}
             onClick={() => setOpen(false)}
             className={({ isActive }) => classNames(isActive && 'active')}
+            aria-label={n.label}
           >
-            <span role="img" aria-label={n.label} style={{ width: 20, display:'inline-flex', justifyContent:'center' }}>{n.icon}</span>
+            <span role="img" aria-hidden="true" style={{ width: 20, display:'inline-flex', justifyContent:'center' }}>{n.icon}</span>
             <span>{n.label}</span>
           </NavLink>
         ))}

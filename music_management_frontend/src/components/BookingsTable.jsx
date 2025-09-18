@@ -55,7 +55,11 @@
              </tr>
            ))}
            {bookings.length === 0 && (
-             <tr><td colSpan={cols.length} style={{ color:'var(--muted)' }}>No bookings found.</td></tr>
+             <tr>
+               <td colSpan={cols.length}>
+                 <div className="empty-state">No bookings found.</div>
+               </td>
+             </tr>
            )}
          </tbody>
        </table>

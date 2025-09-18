@@ -49,7 +49,7 @@ export default function BookingsPage({ mockBookings }) {
 
       <div className="card widget col-12" style={{ padding: 0, overflow: 'hidden' }}>
         {/* Tabs */}
-        <div style={{ padding: 14, display: 'flex', gap: 8, alignItems: 'center', borderBottom: '1px solid var(--border)', flexWrap: 'wrap' }}>
+        <div className="card-header" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           {tabBtn('all', 'All')}
           {tabBtn('city', 'By City')}
           {activeTab === 'city' && (
@@ -57,6 +57,7 @@ export default function BookingsPage({ mockBookings }) {
               <label htmlFor="cityFilter" style={{ fontSize: 13, color: 'var(--muted)' }}>City</label>
               <select
                 id="cityFilter"
+                aria-label="Filter bookings by city"
                 className="select"
                 value={cityFilter}
                 onChange={e => setCityFilter(e.target.value)}

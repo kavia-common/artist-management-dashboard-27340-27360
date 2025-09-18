@@ -28,9 +28,9 @@ export default function ArtistsPage({ mockArtists }) {
       </div>
 
       <div className="card widget col-12" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: 14, display:'flex', flexWrap:'wrap', gap:10, borderBottom:'1px solid var(--border)' }}>
-          <input className="input" placeholder="Search artists..." value={q} onChange={e=>setQ(e.target.value)} style={{ flex:'1 1 220px' }} />
-          <select className="select" defaultValue="" style={{ flex:'1 1 160px', minWidth:140 }}>
+        <div className="card-header" style={{ display:'flex', flexWrap:'wrap', gap:10 }}>
+          <input className="input" placeholder="Search artists..." aria-label="Search artists" value={q} onChange={e=>setQ(e.target.value)} style={{ flex:'1 1 220px' }} />
+          <select className="select" defaultValue="" aria-label="Filter by genre" style={{ flex:'1 1 160px', minWidth:140 }}>
             <option value="">All Genres</option>
             <option>Pop</option>
             <option>EDM</option>

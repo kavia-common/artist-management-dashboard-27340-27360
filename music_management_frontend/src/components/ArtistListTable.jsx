@@ -38,7 +38,11 @@
              </tr>
            ))}
            {artists.length === 0 && (
-             <tr><td colSpan="7" style={{ color:'var(--muted)' }}>No artists found.</td></tr>
+             <tr>
+               <td colSpan="7">
+                 <div className="empty-state">No artists found.</div>
+               </td>
+             </tr>
            )}
          </tbody>
        </table>

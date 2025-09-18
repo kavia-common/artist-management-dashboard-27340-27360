@@ -33,7 +33,7 @@
            </div>
          ))}
          {events.length === 0 && (
-           <div style={{ padding: 10, color:'var(--muted)' }}>No events scheduled.</div>
+           <div className="empty-state">No events scheduled.</div>
          )}
        </div>
      </div>
