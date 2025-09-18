@@ -37,6 +37,7 @@ function classNames(...arr) {
 // PUBLIC_INTERFACE
 function Sidebar() {
   /** Sidebar for app navigation, styled with Ocean Professional theme */
+  const [open, setOpen] = useState(false);
   const navItems = [
     { to: '/', label: 'Dashboard', icon: '📊' },
     { to: '/artists', label: 'Artists', icon: '🎤' },
@@ -44,16 +45,34 @@ function Sidebar() {
     { to: '/schedule', label: 'Schedule', icon: '🗓️' },
   ];
 
+  const closeOnNavigate = () => setOpen(false);
+
   return (
-    <aside className="sidebar">
+    <aside className={classNames('sidebar', open && 'open')} aria-label="Sidebar Navigation">
       <div className="brand">
-        <div className="brand-logo">A</div>
-        <div className="brand-name">ArtistMgmt</div>
+        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          <div className="brand-logo" aria-hidden>A</div>
+          <div className="brand-name">ArtistMgmt</div>
+        </div>
+        <button
+          className="mobile-toggle"
+          aria-label="Toggle navigation"
+          aria-expanded={open}
+          onClick={() => setOpen(v => !v)}
+        >
+          ☰
+        </button>
       </div>
-      <nav className="nav">
+      <nav className="nav" role="navigation">
         {navItems.map(n => (
-          <NavLink key={n.to} to={n.to} end={n.to === '/'} className={({ isActive }) => classNames(isActive && 'active')}>
-            <span role="img" aria-label={n.label} style={{ width: 20 }}>{n.icon}</span>
+          <NavLink
+            key={n.to}
+            to={n.to}
+            end={n.to === '/'}
+            onClick={closeOnNavigate}
+            className={({ isActive }) => classNames(isActive && 'active')}
+          >
+            <span role="img" aria-label={n.label} style={{ width: 20, display:'inline-flex', justifyContent:'center' }}>{n.icon}</span>
             <span>{n.label}</span>
           </NavLink>
         ))}
@@ -128,30 +147,32 @@ function DashboardPage() {
 
         <div className="card widget col-8">
           <h3>Recent Bookings</h3>
-          <table className="table" role="table" aria-label="Recent bookings">
-            <thead>
-              <tr>
-                <th>Artist</th><th>Venue</th><th>City</th><th>Date</th><th>Fee</th><th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mockBookings.slice(0,4).map(b => (
-                <tr key={b.id}>
-                  <td>{b.artist}</td>
-                  <td>{b.venue}</td>
-                  <td>{b.city}</td>
-                  <td>{b.date}</td>
-                  <td>${b.fee.toLocaleString()}</td>
-                  <td>
-                    <span className="badge">
-                      <span className="badge-dot" style={{ background: b.status === 'Confirmed' ? '#10B981' : b.status === 'Pending' ? '#F59E0B' : '#EF4444' }} />
-                      {b.status}
-                    </span>
-                  </td>
+          <div className="table-wrap" role="region" aria-label="Recent bookings scroll area">
+            <table className="table" role="table" aria-label="Recent bookings">
+              <thead>
+                <tr>
+                  <th>Artist</th><th>Venue</th><th>City</th><th>Date</th><th>Fee</th><th>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {mockBookings.slice(0,4).map(b => (
+                  <tr key={b.id}>
+                    <td>{b.artist}</td>
+                    <td>{b.venue}</td>
+                    <td>{b.city}</td>
+                    <td>{b.date}</td>
+                    <td>${b.fee.toLocaleString()}</td>
+                    <td>
+                      <span className="badge">
+                        <span className="badge-dot" style={{ background: b.status === 'Confirmed' ? '#10B981' : b.status === 'Pending' ? '#F59E0B' : '#EF4444' }} />
+                        {b.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div className="card widget col-4">
@@ -202,49 +223,51 @@ function ArtistsPage() {
       </div>
 
       <div className="card widget col-12" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: 14, display:'flex', gap:10, borderBottom:'1px solid var(--border)' }}>
-          <input className="input" placeholder="Search artists..." value={q} onChange={e=>setQ(e.target.value)} />
-          <select className="select" defaultValue="">
+        <div style={{ padding: 14, display:'flex', flexWrap:'wrap', gap:10, borderBottom:'1px solid var(--border)' }}>
+          <input className="input" placeholder="Search artists..." value={q} onChange={e=>setQ(e.target.value)} style={{ flex:'1 1 220px' }} />
+          <select className="select" defaultValue="" style={{ flex:'1 1 160px', minWidth:140 }}>
             <option value="">All Genres</option>
             <option>Pop</option>
             <option>EDM</option>
             <option>Indie Rock</option>
             <option>R&B</option>
           </select>
-          <select className="select" defaultValue="">
+          <select className="select" defaultValue="" style={{ flex:'1 1 140px', minWidth:120 }}>
             <option value="">All Status</option>
             <option>Active</option>
             <option>Paused</option>
           </select>
         </div>
         <div style={{ padding: 14 }}>
-          <table className="table" role="table" aria-label="Artists">
-            <thead>
-              <tr>
-                <th>Name</th><th>Genre</th><th>Rating</th><th>Bookings</th><th>Next Show</th><th>Status</th><th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(a => (
-                <tr key={a.id}>
-                  <td style={{ fontWeight:700 }}>{a.name}</td>
-                  <td>{a.genre}</td>
-                  <td>{a.rating}</td>
-                  <td>{a.bookings}</td>
-                  <td>{a.nextShow}</td>
-                  <td>
-                    <span className="badge">
-                      <span className="badge-dot" style={{ background: a.status === 'Active' ? '#10B981' : '#9CA3AF' }} />
-                      {a.status}
-                    </span>
-                  </td>
-                  <td>
-                    <button className="btn ghost" onClick={() => navigate(`/artists/${a.id}`)}>View</button>
-                  </td>
+          <div className="table-wrap" role="region" aria-label="Artists table scroll area">
+            <table className="table" role="table" aria-label="Artists">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Genre</th><th>Rating</th><th>Bookings</th><th>Next Show</th><th>Status</th><th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map(a => (
+                  <tr key={a.id}>
+                    <td style={{ fontWeight:700 }}>{a.name}</td>
+                    <td>{a.genre}</td>
+                    <td>{a.rating}</td>
+                    <td>{a.bookings}</td>
+                    <td>{a.nextShow}</td>
+                    <td>
+                      <span className="badge">
+                        <span className="badge-dot" style={{ background: a.status === 'Active' ? '#10B981' : '#9CA3AF' }} />
+                        {a.status}
+                      </span>
+                    </td>
+                    <td>
+                      <button className="btn ghost" onClick={() => navigate(`/artists/${a.id}`)}>View</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -285,30 +308,32 @@ function ArtistProfile({ id }) {
 
         <div className="card widget col-8">
           <h3>Upcoming Bookings</h3>
-          <table className="table">
-            <thead>
-              <tr><th>Venue</th><th>City</th><th>Date</th><th>Fee</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-              {upcoming.map(b => (
-                <tr key={b.id}>
-                  <td>{b.venue}</td>
-                  <td>{b.city}</td>
-                  <td>{b.date}</td>
-                  <td>${b.fee.toLocaleString()}</td>
-                  <td>
-                    <span className="badge">
-                      <span className="badge-dot" style={{ background: b.status === 'Confirmed' ? '#10B981' : b.status === 'Pending' ? '#F59E0B' : '#EF4444' }} />
-                      {b.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {upcoming.length === 0 && (
-                <tr><td colSpan="5" style={{ color:'var(--muted)' }}>No bookings yet.</td></tr>
-              )}
-            </tbody>
-          </table>
+          <div className="table-wrap" role="region" aria-label="Upcoming bookings scroll area">
+            <table className="table">
+              <thead>
+                <tr><th>Venue</th><th>City</th><th>Date</th><th>Fee</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                {upcoming.map(b => (
+                  <tr key={b.id}>
+                    <td>{b.venue}</td>
+                    <td>{b.city}</td>
+                    <td>{b.date}</td>
+                    <td>${b.fee.toLocaleString()}</td>
+                    <td>
+                      <span className="badge">
+                        <span className="badge-dot" style={{ background: b.status === 'Confirmed' ? '#10B981' : b.status === 'Pending' ? '#F59E0B' : '#EF4444' }} />
+                        {b.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {upcoming.length === 0 && (
+                  <tr><td colSpan="5" style={{ color:'var(--muted)' }}>No bookings yet.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -331,28 +356,30 @@ function BookingsPage() {
       </div>
       <div className="card widget col-12">
         <h3>All Bookings</h3>
-        <table className="table" role="table" aria-label="Bookings">
-          <thead>
-            <tr><th>Artist</th><th>Venue</th><th>City</th><th>Date</th><th>Fee</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            {mockBookings.map(b => (
-              <tr key={b.id}>
-                <td style={{ fontWeight:700 }}>{b.artist}</td>
-                <td>{b.venue}</td>
-                <td>{b.city}</td>
-                <td>{b.date}</td>
-                <td>${b.fee.toLocaleString()}</td>
-                <td>
-                  <span className="badge">
-                    <span className="badge-dot" style={{ background: b.status === 'Confirmed' ? '#10B981' : b.status === 'Pending' ? '#F59E0B' : '#EF4444' }} />
-                    {b.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="table-wrap" role="region" aria-label="Bookings table scroll area">
+          <table className="table" role="table" aria-label="Bookings">
+            <thead>
+              <tr><th>Artist</th><th>Venue</th><th>City</th><th>Date</th><th>Fee</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              {mockBookings.map(b => (
+                <tr key={b.id}>
+                  <td style={{ fontWeight:700 }}>{b.artist}</td>
+                  <td>{b.venue}</td>
+                  <td>{b.city}</td>
+                  <td>{b.date}</td>
+                  <td>${b.fee.toLocaleString()}</td>
+                  <td>
+                    <span className="badge">
+                      <span className="badge-dot" style={{ background: b.status === 'Confirmed' ? '#10B981' : b.status === 'Pending' ? '#F59E0B' : '#EF4444' }} />
+                      {b.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
